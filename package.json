@@ -1,0 +1,22 @@
+{
+  "name": "hooli-pi",
+  "version": "1.0.0",
+  "description": "processing input sensors on hooli device",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rowleyj/Hooli-Pi.git"
+  },
+  "author": "Jesse Rowley",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rowleyj/Hooli-Pi/issues"
+  },
+  "homepage": "https://github.com/rowleyj/Hooli-Pi#readme",
+  "dependencies": {
+    "onoff": "^6.0.3"
+  }
+}
