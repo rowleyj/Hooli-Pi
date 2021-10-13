@@ -1,4 +1,4 @@
-const LED = require('./src/classes/LED');
+const LED = require('./src/classes/LED').LED;
 
 let led1 = new LED(4, 500, 10000);
 

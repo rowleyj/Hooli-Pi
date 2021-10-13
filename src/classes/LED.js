@@ -1,6 +1,6 @@
 const gpio = require('onoff').Gpio;
 
-export class LED{
+class LED{
     /**
      * 
      * @param {number} pinNumber - GPIO port number
@@ -24,11 +24,16 @@ export class LED{
     }
 
     start(){
-        const blinkInterval = setInterval(this.blink, this.interval);
+        const blinkInterval = setInterval(this.blink(), this.interval);
         setTimeout(() => {
+            clearInterval(blinkInterval);
             this.led.writeSync(0);
             // free up GPIO
             this.led.unexport();
         }, this.timeout);
     }
+}
+
+module.exports = {
+    LED: LED
 }
