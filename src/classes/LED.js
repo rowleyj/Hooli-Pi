@@ -24,7 +24,8 @@ class LED{
     }
 
     start(){
-        const blinkInterval = setInterval(this.blink(), this.interval);
+        // need to bind the instance to the method being ran in the interval
+        const blinkInterval = setInterval(this.blink.bind(this), this.interval);
         setTimeout(() => {
             clearInterval(blinkInterval);
             this.led.writeSync(0);
