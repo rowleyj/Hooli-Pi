@@ -1,7 +1,9 @@
 const SerialPort = require('serialport')
-const port = new SerialPort('/dev/ttyAMA0', {
+const port = new SerialPort('/dev/serial0', {
   baudRate: 921600
 })
+
+console.log('Attempting to connect');
 
 // Open errors will be emitted as an error event
 port.on('error', function(err) {
@@ -17,3 +19,5 @@ port.on('readable', function () {
 port.on('data', function (data) {
   console.log('Data:', data)
 })
+
+console.log('port listeners registered');

@@ -18,6 +18,7 @@
   "homepage": "https://github.com/rowleyj/Hooli-Pi#readme",
   "dependencies": {
     "onoff": "^6.0.3",
+    "pi-camera": "^1.6.0",
     "serialport": "^9.2.4"
   }
 }
