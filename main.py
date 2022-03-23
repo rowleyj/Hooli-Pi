@@ -30,6 +30,7 @@ import json
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(24, GPIO.IN)
 camera = PiCamera()
+camera.resolution = (1920,1080)
 #Defining GPS Ping function, gets current position
 def GPSPing():
 	#Listen to port 2947
@@ -70,8 +71,9 @@ def GPSPing():
 	
 	
 #	return distances
-	
+counter= 0
 while True:
+	
 	#User pushes record button, start record loop
 	if GPIO.input(24) == 1:
 		print("Starting Ride...")
@@ -80,7 +82,7 @@ while True:
 		print("Ride Successfully Started!")
 		#start camera recording
 		camera.start_preview()
-		camera.start_recording('/home/pi/Desktop/Payload/Recordings/testvid.h264')
+		camera.start_recording('/home/pi/Desktop/Payload/Recordings/testvid'+str(counter)+'.h264')
 		
 		startTime = time()
 		#initialize data arrays to be packaged into json file
@@ -96,7 +98,7 @@ while True:
 				#print('program halted, vvideo recorded')
 				endTime = time()
 				#package data
-				command = "MP4Box -add /home/pi/Desktop/Payload/Recordings/testvid.h264 /home/pi/Desktop/Payload/Recordings/testvid.mp4"
+				command = "MP4Box -add /home/pi/Desktop/Payload/Recordings/testvid"+str(counter)+".h264 /home/pi/Desktop/Payload/Recordings/testvid"+str(counter)+".mp4"
 				subprocess.call([command], shell=True)
 				myPackage = {"start":startTime, "end":endTime, "GPS":GPS_Coords, "misses":miss_times}
 				pkgString = json.dumps(myPackage)
@@ -107,6 +109,7 @@ while True:
 				#sleep so we don't immediately start the program
 				sleep(5)
 				print("Ride Ended")
+				counter= counter+1
 				break
 			else:
 				sleep(1)
