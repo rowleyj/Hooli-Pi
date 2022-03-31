@@ -171,6 +171,9 @@ while True:
 			else:
 				sleep(1)
 				GPS_Coords.append(GPSPing())
+				sense_dist = getDist()
+				if sense_dist<=1000:
+					miss_time.append(time())
 				
 				
 				
