@@ -8,6 +8,8 @@ from picamera import PiCamera
 import RPi.GPIO as GPIO
 import subprocess
 import json
+
+
 #psuedocode
 #while true (This program runs while the pi is on)
 	#press button to begin data recording session
@@ -29,6 +31,7 @@ import json
 #Defining constant variables
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(24, GPIO.IN)
+GPIO.setup(23, GPIO.OUT)
 camera = PiCamera()
 camera.resolution = (1920,1080)
 #Defining GPS Ping function, gets current position
@@ -64,8 +67,59 @@ def GPSPing():
 	
 #Defining Distance Sensor Ping function
 #Gets readings from all 3 sensors, outputs array of 3 readings
+TOF_length = 16
+TOF_header = (87, 0, 255)
+TOF_distance = 0
 
-#def getDist():
+ser = serial.Serial('/dev/serial0', 115200, timeout=2.0)
+ser.reset_input_buffer()
+def verifyCheckSum(data,length):
+	TOF_check =0
+	print(data)
+	print(length)
+	print("length:",len(data))
+	for k in range(0, length-1):
+		TOF_check += data[k]
+	TOF_check = TOF_check%256
+	
+	if(TOF_check == data[length-1]):
+		#data is ok
+		return 1
+	else:
+		#data is not okay, error present
+		return 0
+def getDist():
+	ser.reset_input_buffer()
+	while True:
+	TOF_data=()
+	sleep(0.05)
+	
+	try:
+		
+		#print("Type test", type(ser.in_waiting()))
+		if ser.in_waiting >= 32:
+			for i in range(0,16):
+				TOF_data = TOF_data + (ord(ser.read(1)), ord(ser.read(1)))
+			print("TOF_data:", TOF_data)
+			
+			for j in range(0,16):
+				
+				if((TOF_data[j]==TOF_header[0] and TOF_data[j+1] == TOF_header[1] and TOF_data[j+2]==TOF_header[2]) and (verifyCheckSum(TOF_data[j:TOF_length],TOF_length))):
+					if(((TOF_data[j+12]) | (TOF_data[j+13]<<8))==0):
+						#it's out of range
+						print("out of range")
+					else:
+						print("id is:", TOF_data[j+3])
+						
+						TOF_distance = (TOF_data[j+8]) | (TOF_data[j+9]<<8) | (TOF_data[j+10]<<16);
+						print("Distance is:", TOF_distance)
+						return TOF_distance
+						break
+			break
+	except:
+		print("Excepterino")
+		ser = serial.Serial('/dev/serial0', 115200, timeout=2.0)
+		ser.reset_input_buffer()
 #	#loop distance sensor code
 #	distances =[]
 	
@@ -79,6 +133,7 @@ while True:
 		print("Starting Ride...")
 		#sleep so we don't immediately terminate program
 		sleep(5)
+		GPIO.output(23,1)
 		print("Ride Successfully Started!")
 		#start camera recording
 		camera.start_preview()
@@ -95,6 +150,7 @@ while True:
 				camera.stop_recording()
 				camera.stop_preview()
 				
+				
 				#print('program halted, vvideo recorded')
 				endTime = time()
 				#package data
@@ -109,6 +165,7 @@ while True:
 				#sleep so we don't immediately start the program
 				sleep(5)
 				print("Ride Ended")
+				GPIO.output(23,0)
 				counter= counter+1
 				break
 			else:
