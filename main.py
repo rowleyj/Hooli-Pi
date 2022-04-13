@@ -142,6 +142,9 @@ while True:
 		startTime = time()
 		#initialize data arrays to be packaged into json file
 		GPS_Coords = []
+		miss_array1 = []
+		miss_array2 = []
+		miss_array3 = []
 		miss_times = []
 		#user pushes record button, save data and exit record loop
 		while True:
@@ -149,14 +152,25 @@ while True:
 			if GPIO.input(24) == 1:
 				camera.stop_recording()
 				camera.stop_preview()
-				
-				
+				GPS_data = {
+					"coords" : GPS_Coords,
+					"delay" : 150 
+				}
+				Dist_data = {
+					"sensor1" : miss_array1,
+					"sensor2" : miss_array2,
+					"sensor3" : miss_array3,
+					"delay" : 150 
+				}
+				CP_data = {
+					"timings" : miss_times
+				}
 				#print('program halted, vvideo recorded')
 				endTime = time()
 				#package data
 				command = "MP4Box -add /home/pi/Desktop/Payload/Recordings/testvid"+str(counter)+".h264 /home/pi/Desktop/Payload/Recordings/testvid"+str(counter)+".mp4"
 				subprocess.call([command], shell=True)
-				myPackage = {"start":startTime, "end":endTime, "GPS":GPS_Coords, "misses":miss_times}
+				myPackage = {"start":startTime, "end":endTime, "gps":GPS_data,  "distance":Dist_data, "closePasses":CP_data}
 				pkgString = json.dumps(myPackage)
 				jsonFile = open("/home/pi/Desktop/Payload/payload.json", "w")
 				jsonFile.write(pkgString)
@@ -172,6 +186,9 @@ while True:
 				sleep(1)
 				GPS_Coords.append(GPSPing())
 				sense_dist = getDist()
+				miss_array1.append(sense_dist)
+				miss_array2.append(1200)
+				miss_array3.append(1200)
 				if sense_dist<=1000:
 					miss_time.append(time())
 				
